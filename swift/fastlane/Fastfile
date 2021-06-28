@@ -1,0 +1,102 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+xcodeproj = './testfastlane.xcodeproj'
+workspace = './testfastlane.xcworkspace'
+APP_IDENTIFIER = ENV["MATCH_APP_IDENTIFIER"]
+TEAM_ID = ENV["FASTLANE_TEAM_ID"]
+FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
+
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+  end
+
+  lane :increment_build_number_manually do
+    increment_build_number({
+      xcodeproj: xcodeproj,
+      build_number: latest_testflight_build_number(app_identifier: APP_IDENTIFIER) + 1
+    })
+  end
+
+  desc 'Fetch certificates and provisioning profiles'
+  lane :certificates do |options|
+    PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+    match(
+      app_identifier: APP_IDENTIFIER,
+      type: (options[:release] ? "appstore" : "development"),
+      readonly: true,
+    )
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: xcodeproj,
+      targets: "testfastlane",
+      build_configurations: (options[:release] ? "Release" : "Release"),
+      code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
+      profile_name: PROFILE_NAME
+    )
+  end
+
+  desc "Setup and Build with options"
+  private_lane :build do |options|
+    PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+    # increment_build_number_manually
+    certificates(release: options[:release], profile_name: PROFILE_NAME)
+    # sh("flutter build ios")
+    sh("pod install")
+    settings_to_override = {
+      :BUNDLE_IDENTIFIER => APP_IDENTIFIER,
+      :PROVISIONING_PROFILE_SPECIFIER => PROFILE_NAME,
+      :DEVELOPMENT_TEAM => TEAM_ID
+    }
+    build_app(
+      scheme: "testfastlane",
+      workspace: workspace,
+      export_method: (options[:release] ? "app-store" : "development"),
+      # archive_path: "./build/Runner.xcarchive",
+      # output_directory: "./build/Runner",
+      xcargs: settings_to_override,
+      export_options: {
+        provisioningProfiles: { 
+          APP_IDENTIFIER => PROFILE_NAME
+        }
+      }
+    )
+  end
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    build(release: true)
+    # changelog_from_git_commits # this will generate the changelog based on your last commits
+    # testflight(
+    #   skip_waiting_for_build_processing: true
+    # )
+  end
+
+  desc "Push a new beta build to Firebase"
+  lane :firebase do
+    build(release: false)
+    # firebase_app_distribution(
+    #   app: "1:978524361958:ios:8433c15f3fed2da7cbd727",
+    #   testers: "jimmy.to.goldenowl@gmail.com",
+    #   release_notes: sh("git log -1 --pretty='%s'"),
+    #   firebase_cli_path: "/usr/local/bin/firebase",
+    #   ipa_path: "Runner.ipa",     
+    #   firebase_cli_token: FIREBASE_CLI_TOKEN
+    # )
+  end
+
+end
