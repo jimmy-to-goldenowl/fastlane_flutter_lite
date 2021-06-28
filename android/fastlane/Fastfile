@@ -22,11 +22,11 @@ platform :android do
   desc "Submit a new beta build to Google Play"
   lane :beta do
     sh "flutter build appbundle -v"
-    upload_to_play_store(
-      track: 'beta',
-      release_status: 'draft',  # TODO: remove after enable beta
-      aab: '../build/app/outputs/bundle/release/app-release.aab',
-      )
+    # upload_to_play_store(
+    #   track: 'beta',
+    #   release_status: 'draft',  # TODO: remove after enable beta
+    #   aab: '../build/app/outputs/bundle/release/app-release.aab',
+    #   )
   end
 
   desc "Promote beta track to prod"
