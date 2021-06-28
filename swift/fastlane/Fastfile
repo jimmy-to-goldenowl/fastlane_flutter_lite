@@ -59,10 +59,13 @@ platform :ios do
     PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
     
     ensure_temp_keychain(MATCH_KEYCHAIN_NAME, MATCH_KEYCHAIN_PASSWORD)
+
     match(
       app_identifier: APP_IDENTIFIER,
       type: (options[:release] ? "appstore" : "development"),
       readonly: true,
+      keychain_name: MATCH_KEYCHAIN_NAME,
+      keychain_password: MATCH_KEYCHAIN_PASSWORD,
     )
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -108,7 +111,7 @@ platform :ios do
     #   skip_waiting_for_build_processing: true
     # )
 
-    delete_temp_keychain(keychain_name)
+    delete_temp_keychain(MATCH_KEYCHAIN_NAME)
   end
 
   desc "Push a new beta build to Firebase"
@@ -123,7 +126,7 @@ platform :ios do
     #   firebase_cli_token: FIREBASE_CLI_TOKEN
     # )
 
-    delete_temp_keychain(keychain_name)
+    delete_temp_keychain(MATCH_KEYCHAIN_NAME)
   end
 
 end
