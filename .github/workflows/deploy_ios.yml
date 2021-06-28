@@ -41,12 +41,12 @@ jobs:
         run: flutter build ios --release --no-codesign
 
       # Setup Ruby, Bundler, and Gemfile dependencies
-      - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.6'
-          bundler-cache: true
-          working-directory: ios
+      # - name: Setup Fastlane
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: '2.6'
+      #     bundler-cache: true
+      #     working-directory: ios
           
       # # Build and deploy with Fastlane (by default, to beta track) 🚀.
       # - name: Run fastlane deploy
