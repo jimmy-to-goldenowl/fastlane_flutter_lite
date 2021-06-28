@@ -36,7 +36,7 @@ jobs:
 
       - name: flutter pub get
         run: flutter pub get
-        
+
       - name: flutter build ios --release --no-codesign
         run: flutter build ios --release --no-codesign
 
@@ -48,9 +48,27 @@ jobs:
           bundler-cache: true
           working-directory: ios
           
-      # Build and deploy with Fastlane (by default, to beta track) 🚀.
-      - name: Run fastlane deploy
-        run: bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}        
+      # # Build and deploy with Fastlane (by default, to beta track) 🚀.
+      # - name: Run fastlane deploy
+      #   run: bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}        
+      #   env:
+      #     FASTLANE_USER: ${{ secrets.FASTLANE_USER}}
+      #     FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+      #     FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD}}
+      #     FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+      #     FASTLANE_ITC_TEAM_ID: ${{ secrets.FASTLANE_ITC_TEAM_ID}}
+      #     MATCH_APP_IDENTIFIER: ${{ secrets.MATCH_APP_IDENTIFIER}}
+      #     MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD}}
+      #     MATCH_GIT_BASIC_AUTHORIZATION: ${{secrets.MATCH_GIT_BASIC_AUTHORIZATION}}
+      #     FIREBASE_CLI_TOKEN: ${{secrets.FIREBASE_CLI_TOKEN}}
+      #     FIREBASEAPPDISTRO_GROUPS: ${{secrets.FIREBASEAPPDISTRO_GROUPS}}
+      #   working-directory: ios
+
+      - name: Deploy iOS via maierj/Fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: ${{ github.event.inputs.lane || 'beta' }}
+          subdirectory: ios
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER}}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
@@ -62,4 +80,3 @@ jobs:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{secrets.MATCH_GIT_BASIC_AUTHORIZATION}}
           FIREBASE_CLI_TOKEN: ${{secrets.FIREBASE_CLI_TOKEN}}
           FIREBASEAPPDISTRO_GROUPS: ${{secrets.FIREBASEAPPDISTRO_GROUPS}}
-        working-directory: ios
