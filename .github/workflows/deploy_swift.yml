@@ -49,6 +49,6 @@ jobs:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{secrets.MATCH_GIT_BASIC_AUTHORIZATION}}
           FIREBASE_CLI_TOKEN: ${{secrets.FIREBASE_CLI_TOKEN}}
           FIREBASEAPPDISTRO_GROUPS: ${{secrets.FIREBASEAPPDISTRO_GROUPS}}
-          MATCH_KEYCHAIN_NAME: login.keychain
-          MATCH_KEYCHAIN_PASSWORD: chelsea
+          MATCH_KEYCHAIN_NAME: ${{secrets.MATCH_KEYCHAIN_NAME}}
+          MATCH_KEYCHAIN_PASSWORD: ${{secrets.MATCH_KEYCHAIN_PASSWORD}}
         working-directory: swift
