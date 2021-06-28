@@ -19,6 +19,29 @@ APP_IDENTIFIER = ENV["MATCH_APP_IDENTIFIER"]
 TEAM_ID = ENV["FASTLANE_TEAM_ID"]
 FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
 
+MATCH_KEYCHAIN_NAME = ENV["MATCH_KEYCHAIN_NAME"]
+MATCH_KEYCHAIN_PASSWORD = ENV["MATCH_KEYCHAIN_PASSWORD"]
+
+def delete_temp_keychain(name)
+  delete_keychain(
+    name: name
+  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+end
+
+def create_temp_keychain(name, password)
+  create_keychain(
+    name: name,
+    password: password,
+    unlock: false,
+    timeout: false
+  )
+end
+
+def ensure_temp_keychain(name, password)
+  delete_temp_keychain(name)
+  create_temp_keychain(name, password)
+end
+
 default_platform(:ios)
 
 platform :ios do
@@ -35,6 +58,8 @@ platform :ios do
   desc 'Fetch certificates and provisioning profiles'
   lane :certificates do |options|
     PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+    
+    ensure_temp_keychain(MATCH_KEYCHAIN_NAME, MATCH_KEYCHAIN_PASSWORD)
     match(
       app_identifier: APP_IDENTIFIER,
       type: (options[:release] ? "appstore" : "development"),
