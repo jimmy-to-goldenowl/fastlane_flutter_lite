@@ -33,7 +33,6 @@ def create_temp_keychain(name, password)
     name: name,
     password: password,
     unlock: false,
-    timeout: false
   )
 end
 
@@ -108,6 +107,8 @@ platform :ios do
     # testflight(
     #   skip_waiting_for_build_processing: true
     # )
+
+    delete_temp_keychain(keychain_name)
   end
 
   desc "Push a new beta build to Firebase"
@@ -121,6 +122,8 @@ platform :ios do
     #   ipa_path: "Runner.ipa",     
     #   firebase_cli_token: FIREBASE_CLI_TOKEN
     # )
+
+    delete_temp_keychain(keychain_name)
   end
 
 end
