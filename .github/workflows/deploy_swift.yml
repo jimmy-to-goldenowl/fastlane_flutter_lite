@@ -23,17 +23,9 @@ jobs:
       #   with:
       #     xcode-version: latest-stable
 
-      # Set up Flutter.
-      - name: Clone Flutter repository with master channel
-        uses: subosito/flutter-action@v1.5.0
-        with:
-          channel: stable
-      - run: flutter doctor -v
-
       # Checkout sourve code and get packages.
       - name: Checkout source code
         uses: actions/checkout@v2
-      - run: flutter pub get
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane

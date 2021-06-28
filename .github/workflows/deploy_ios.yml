@@ -33,7 +33,12 @@ jobs:
       # Checkout sourve code and get packages.
       - name: Checkout source code
         uses: actions/checkout@v2
-      - run: flutter pub get
+
+      - name: flutter pub get
+        run: flutter pub get
+        
+      - name: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
