@@ -35,15 +35,6 @@ jobs:
         uses: actions/checkout@v2
       - run: flutter pub get
 
-      # Sync dart code to iOS project
-      # - run: flutter build ios --release --no-codesign
-      # Or try pod install
-      - name: Install pod modules
-        run: |
-          gem install cocoapods -v 1.10.1
-          pod install --project-directory=ios
-
-
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
         uses: ruby/setup-ruby@v1
