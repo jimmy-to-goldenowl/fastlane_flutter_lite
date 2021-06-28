@@ -33,7 +33,6 @@ jobs:
       # Checkout sourve code and get packages.
       - name: Checkout source code
         uses: actions/checkout@v2
-      - run: cp .env.sample .env
       - run: flutter pub get
 
       # Sync dart code to iOS project
