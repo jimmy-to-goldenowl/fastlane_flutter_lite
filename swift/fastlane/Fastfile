@@ -71,7 +71,7 @@ platform :ios do
     )
     update_code_signing_settings(
       use_automatic_signing: false,
-      path: xcodeproj,
+      path: "#{sh("pwd").strip}/testfastlane.xcodeproj",
       targets: "testfastlane",
       build_configurations: (options[:release] ? "Release" : "Release"),
       code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
@@ -81,6 +81,8 @@ platform :ios do
 
   desc "Setup and Build with options"
   private_lane :build do |options|
+    puts("Fastlane - Currentdir: #{sh("pwd")}")
+    
     # increment_build_number_manually
     certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
     # sh("flutter build ios --release --no-codesign")
@@ -89,9 +91,9 @@ platform :ios do
       :PROVISIONING_PROFILE_SPECIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"],
       :DEVELOPMENT_TEAM => TEAM_ID
     }
-    disable_automatic_code_signing(path: xcodeproj)
 
     build_app(
+      project: "#{sh("pwd").strip}/testfastlane.xcworkspace"
       scheme: "testfastlane",
       workspace: workspace,
       export_method: (options[:release] ? "app-store" : "development"),
@@ -99,12 +101,12 @@ platform :ios do
       # output_directory: "./build/Runner",
       xcargs: settings_to_override,
       export_options: {
+        signingStyle: "manual",
         provisioningProfiles: { 
           APP_IDENTIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
-    enable_automatic_code_signing(path: xcodeproj)
 
   end
 
