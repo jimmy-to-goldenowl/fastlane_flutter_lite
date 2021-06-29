@@ -74,7 +74,7 @@ platform :ios do
       use_automatic_signing: false,
       path: xcodeproj,
       targets: "swift",
-      build_configurations: (options[:release] ? "Release" : "Release"),
+      # build_configurations: (options[:release] ? "Release" : "Release"),
       code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
       profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
     )
@@ -87,6 +87,7 @@ platform :ios do
     disable_automatic_code_signing(path: xcodeproj)
     # increment_build_number_manually
     certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
+    
     settings_to_override = {
       :BUNDLE_IDENTIFIER => APP_IDENTIFIER,
       :PROVISIONING_PROFILE_SPECIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"],

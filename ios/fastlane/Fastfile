@@ -74,7 +74,7 @@ platform :ios do
       use_automatic_signing: false,
       path: xcodeproj,
       targets: "Runner",
-      build_configurations: (options[:release] ? "Release" : "Release"),
+      # build_configurations: (options[:release] ? "Release" : "Release"),
       code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
       profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
     )
@@ -121,7 +121,7 @@ platform :ios do
 
   desc "Push a new beta build to Firebase"
   lane :firebase do
-    build(release: false)
+    build(release: true)
     # firebase_app_distribution(
     #   app: "1:978524361958:ios:8433c15f3fed2da7cbd727",
     #   testers: "jimmy.to.goldenowl@gmail.com",
