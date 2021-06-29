@@ -63,7 +63,7 @@ platform :ios do
     match(
       app_identifier: APP_IDENTIFIER,
       type: (options[:release] ? "appstore" : "development"),
-      readonly: true,
+      readonly: false,
       keychain_name: MATCH_KEYCHAIN_NAME,
       keychain_password: MATCH_KEYCHAIN_PASSWORD,
     )
