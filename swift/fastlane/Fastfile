@@ -88,6 +88,8 @@ platform :ios do
       :PROVISIONING_PROFILE_SPECIFIER => PROFILE_NAME,
       :DEVELOPMENT_TEAM => TEAM_ID
     }
+    disable_automatic_code_signing(path: xcodeproj)
+
     build_app(
       scheme: "testfastlane",
       workspace: workspace,
@@ -101,6 +103,8 @@ platform :ios do
         }
       }
     )
+    enable_automatic_code_signing(path: xcodeproj)
+
   end
 
   desc "Push a new beta build to TestFlight"

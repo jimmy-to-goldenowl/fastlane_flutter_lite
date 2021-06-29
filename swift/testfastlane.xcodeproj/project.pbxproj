@@ -125,6 +125,8 @@
 				TargetAttributes = {
 					590358F5268A0FFA00B608D1 = {
 						CreatedOnToolsVersion = 12.5.1;
+						DevelopmentTeam = YJM7D2JJB6;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -354,7 +356,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jimmyto9.testfastlane;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.jimmyto9.testfastlane";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
