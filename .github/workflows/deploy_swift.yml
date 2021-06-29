@@ -19,25 +19,21 @@ jobs:
     steps:
     
       # Set the latest Xcode version including beta releases:
-      # - uses: maxim-lobanov/setup-xcode@v1
-      #   with:
-      #     xcode-version: latest-stable
+      - name: Select Xcode Version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
 
       # Checkout sourve code and get packages.
       - name: Checkout source code
         uses: actions/checkout@v2
 
-      # Setup Ruby, Bundler, and Gemfile dependencies
-      - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.6'
-          bundler-cache: true
-          working-directory: swift
-          
       # Build and deploy with Fastlane (by default, to beta track) 🚀.
-      - name: Run fastlane deploy
-        run: bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}        
+      - name: Deploy iOS via maierj/Fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: ${{ github.event.inputs.lane || 'beta' }}
+          subdirectory: ios
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER}}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
@@ -51,4 +47,3 @@ jobs:
           FIREBASEAPPDISTRO_GROUPS: ${{secrets.FIREBASEAPPDISTRO_GROUPS}}
           MATCH_KEYCHAIN_NAME: ${{secrets.MATCH_KEYCHAIN_NAME}}
           MATCH_KEYCHAIN_PASSWORD: ${{secrets.MATCH_KEYCHAIN_PASSWORD}}
-        working-directory: swift
