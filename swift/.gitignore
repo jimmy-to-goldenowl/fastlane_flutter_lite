@@ -33,5 +33,5 @@ Runner/GeneratedPluginRegistrant.*
 !default.perspectivev3
 
 
-testfastlane.ipa
-testfastlane.app.dSYM.zip
+swift.ipa
+swift.app.dSYM.zip

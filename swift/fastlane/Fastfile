@@ -87,7 +87,6 @@ platform :ios do
     disable_automatic_code_signing(path: xcodeproj)
     # increment_build_number_manually
     certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
-    # sh("flutter build ios --release --no-codesign")
     settings_to_override = {
       :BUNDLE_IDENTIFIER => APP_IDENTIFIER,
       :PROVISIONING_PROFILE_SPECIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"],

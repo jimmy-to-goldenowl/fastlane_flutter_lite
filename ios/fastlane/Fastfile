@@ -19,6 +19,30 @@ APP_IDENTIFIER = ENV["MATCH_APP_IDENTIFIER"]
 TEAM_ID = ENV["FASTLANE_TEAM_ID"]
 FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
 
+keychainName = ENV["MATCH_KEYCHAIN_NAME"]
+keychainPassword = ENV["MATCH_KEYCHAIN_PASSWORD"]
+
+def delete_temp_keychain(name)
+  delete_keychain(
+    name: name
+  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+end
+
+def create_temp_keychain(name, password)
+  create_keychain(
+    name: name,
+    password: password,
+    unlock: true,
+    default_keychain: true, 
+    lock_when_sleeps: false,
+  )
+end
+
+def ensure_temp_keychain(name, password)
+  delete_temp_keychain(name)
+  create_temp_keychain(name, password)
+end
+
 default_platform(:ios)
 
 platform :ios do
@@ -34,32 +58,41 @@ platform :ios do
 
   desc 'Fetch certificates and provisioning profiles'
   lane :certificates do |options|
-    PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+    ENV['PROVISIONING_PROFILE_SPECIFIER'] = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+    
+    ensure_temp_keychain(keychainName, keychainPassword)
+    
     match(
       app_identifier: APP_IDENTIFIER,
       type: (options[:release] ? "appstore" : "development"),
       readonly: true,
+      keychain_name: keychainName,
+      keychain_password: keychainPassword,
     )
     update_code_signing_settings(
+      bundle_identifier: APP_IDENTIFIER,
       use_automatic_signing: false,
       path: xcodeproj,
       targets: "Runner",
       build_configurations: (options[:release] ? "Release" : "Release"),
       code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
-      profile_name: PROFILE_NAME
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
     )
   end
 
   desc "Setup and Build with options"
   private_lane :build do |options|
-    PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+
+    disable_automatic_code_signing(path: xcodeproj)
     # increment_build_number_manually
-    certificates(release: options[:release], profile_name: PROFILE_NAME)
+
+    certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
     settings_to_override = {
       :BUNDLE_IDENTIFIER => APP_IDENTIFIER,
-      :PROVISIONING_PROFILE_SPECIFIER => PROFILE_NAME,
+      :PROVISIONING_PROFILE_SPECIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"],
       :DEVELOPMENT_TEAM => TEAM_ID
     }
+
     build_app(
       scheme: "Runner",
       workspace: workspace,
@@ -68,8 +101,9 @@ platform :ios do
       # output_directory: "./build/Runner",
       xcargs: settings_to_override,
       export_options: {
+        signingStyle: "manual",
         provisioningProfiles: { 
-          APP_IDENTIFIER => PROFILE_NAME
+          APP_IDENTIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
@@ -82,6 +116,7 @@ platform :ios do
     # testflight(
     #   skip_waiting_for_build_processing: true
     # )
+    delete_temp_keychain(keychainName)
   end
 
   desc "Push a new beta build to Firebase"
@@ -95,6 +130,7 @@ platform :ios do
     #   ipa_path: "Runner.ipa",     
     #   firebase_cli_token: FIREBASE_CLI_TOKEN
     # )
+    delete_temp_keychain(keychainName)
   end
 
 end
