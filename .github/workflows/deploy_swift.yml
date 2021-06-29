@@ -34,7 +34,7 @@ jobs:
           ruby-version: '2.6.x'
       # Build and deploy with Fastlane (by default, to beta track) 🚀.
       - name: Deploy iOS via maierj/Fastlane
-        uses: maierj/fastlane-action@v2.0.1
+        uses: maierj/fastlane-action@v1.4.0
         with:
           lane: ${{ github.event.inputs.lane || 'beta' }}
           subdirectory: swift
