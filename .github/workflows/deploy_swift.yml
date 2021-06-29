@@ -37,7 +37,7 @@ jobs:
         uses: maierj/fastlane-action@v2.0.1
         with:
           lane: ${{ github.event.inputs.lane || 'beta' }}
-          subdirectory: ios
+          subdirectory: swift
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER}}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
