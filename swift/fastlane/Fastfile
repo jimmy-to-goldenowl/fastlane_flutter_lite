@@ -125,7 +125,7 @@ platform :ios do
 
   desc "Push a new beta build to Firebase"
   lane :firebase do
-    build(release: false)
+    build(release: true)
     # firebase_app_distribution(
     #   app: "1:978524361958:ios:8433c15f3fed2da7cbd727",
     #   testers: "jimmy.to.goldenowl@gmail.com",
