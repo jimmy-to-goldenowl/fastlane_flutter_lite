@@ -95,7 +95,7 @@ platform :ios do
     build_app(
       project: "#{sh("pwd").strip}/testfastlane.xcworkspace"
       scheme: "testfastlane",
-      workspace: workspace,
+      workspace: "#{sh("pwd").strip}/testfastlane.xcworkspace"
       export_method: (options[:release] ? "app-store" : "development"),
       # archive_path: "./build/Runner.xcarchive",
       # output_directory: "./build/Runner",
