@@ -56,7 +56,7 @@ platform :ios do
 
   desc 'Fetch certificates and provisioning profiles'
   lane :certificates do |options|
-    PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
+    ENV['PROVISIONING_PROFILE_SPECIFIER'] = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
     
     ensure_temp_keychain(MATCH_KEYCHAIN_NAME, MATCH_KEYCHAIN_PASSWORD)
 
@@ -73,19 +73,18 @@ platform :ios do
       targets: "testfastlane",
       build_configurations: (options[:release] ? "Release" : "Release"),
       code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
-      profile_name: PROFILE_NAME
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
     )
   end
 
   desc "Setup and Build with options"
   private_lane :build do |options|
-    PROFILE_NAME = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
     # increment_build_number_manually
-    certificates(release: options[:release], profile_name: PROFILE_NAME)
+    certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
     # sh("flutter build ios --release --no-codesign")
     settings_to_override = {
       :BUNDLE_IDENTIFIER => APP_IDENTIFIER,
-      :PROVISIONING_PROFILE_SPECIFIER => PROFILE_NAME,
+      :PROVISIONING_PROFILE_SPECIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"],
       :DEVELOPMENT_TEAM => TEAM_ID
     }
     disable_automatic_code_signing(path: xcodeproj)
@@ -99,7 +98,7 @@ platform :ios do
       xcargs: settings_to_override,
       export_options: {
         provisioningProfiles: { 
-          APP_IDENTIFIER => PROFILE_NAME
+          APP_IDENTIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
