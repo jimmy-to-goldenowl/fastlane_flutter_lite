@@ -13,8 +13,8 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-xcodeproj = './testfastlane.xcodeproj'
-workspace = './testfastlane.xcworkspace'
+xcodeproj = './swift.xcodeproj'
+workspace = './swift.xcworkspace'
 APP_IDENTIFIER = ENV["MATCH_APP_IDENTIFIER"]
 TEAM_ID = ENV["FASTLANE_TEAM_ID"]
 FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
@@ -70,9 +70,10 @@ platform :ios do
       keychain_password: keychainPassword,
     )
     update_code_signing_settings(
+      bundle_identifier: APP_IDENTIFIER,
       use_automatic_signing: false,
-      path: "#{sh("pwd").strip}/testfastlane.xcodeproj",
-      targets: "testfastlane",
+      path: xcodeproj,
+      targets: "swift",
       build_configurations: (options[:release] ? "Release" : "Release"),
       code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
       profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
@@ -83,6 +84,7 @@ platform :ios do
   private_lane :build do |options|
     puts("Fastlane - Currentdir: #{sh("pwd")}")
     
+    disable_automatic_code_signing(path: xcodeproj)
     # increment_build_number_manually
     certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
     # sh("flutter build ios --release --no-codesign")
@@ -93,9 +95,8 @@ platform :ios do
     }
 
     build_app(
-      project: "#{sh("pwd").strip}/testfastlane.xcworkspace"
-      scheme: "testfastlane",
-      workspace: "#{sh("pwd").strip}/testfastlane.xcworkspace"
+      workspace: workspace,
+      scheme: "swift",
       export_method: (options[:release] ? "app-store" : "development"),
       # archive_path: "./build/Runner.xcarchive",
       # output_directory: "./build/Runner",
@@ -108,6 +109,7 @@ platform :ios do
       }
     )
 
+    # enable_automatic_code_signing(path: xcodeproj)
   end
 
   desc "Push a new beta build to TestFlight"
