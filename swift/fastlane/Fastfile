@@ -1,26 +1,9 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
 
 xcodeproj = './swift.xcodeproj'
 workspace = './swift.xcworkspace'
-APP_IDENTIFIER = ENV["MATCH_APP_IDENTIFIER"]
-TEAM_ID = ENV["FASTLANE_TEAM_ID"]
-FIREBASE_CLI_TOKEN = ENV["FIREBASE_CLI_TOKEN"]
-
-keychainName = ENV["MATCH_KEYCHAIN_NAME"]
-keychainPassword = ENV["MATCH_KEYCHAIN_PASSWORD"]
+buildTarget = 'swift'
+keychainName = "keychain_custom"
+keychainPassword = "j1mmyto2021"
 
 def delete_temp_keychain(name)
   delete_keychain(
@@ -47,6 +30,12 @@ default_platform(:ios)
 
 platform :ios do
   before_all do
+    # set up public env
+    ENV['FASTLANE_ITC_TEAM_ID'] = CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id)
+    ENV['FASTLANE_TEAM_ID'] = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+    ENV['MATCH_APP_IDENTIFIER'] = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+    ENV['MATCH_GIT_BRANCH'] = 'dev_2'
+    ENV["PROVISIONING_PROFILE_SPECIFIER"] = "match AppStore "+ ENV["MATCH_APP_IDENTIFIER"]
   end
 
   lane :increment_build_number_manually do
@@ -57,84 +46,69 @@ platform :ios do
   end
 
   desc 'Fetch certificates and provisioning profiles'
-  lane :certificates do |options|
-    ENV['PROVISIONING_PROFILE_SPECIFIER'] = "match " + (options[:release] ? "AppStore " : "Development ") + ENV["MATCH_APP_IDENTIFIER"]
-    
+  private_lane :certificates do
     ensure_temp_keychain(keychainName, keychainPassword)
 
     match(
-      app_identifier: APP_IDENTIFIER,
-      type: (options[:release] ? "appstore" : "development"),
-      readonly: true,
+      app_identifier: ENV["MATCH_APP_IDENTIFIER"],
+      type: "appstore",
+      readonly: false,
       keychain_name: keychainName,
       keychain_password: keychainPassword,
     )
+
     update_code_signing_settings(
-      bundle_identifier: APP_IDENTIFIER,
+      bundle_identifier: ENV["MATCH_APP_IDENTIFIER"],
       use_automatic_signing: false,
       path: xcodeproj,
-      targets: "swift",
-      # build_configurations: (options[:release] ? "Release" : "Release"),
-      code_sign_identity: (options[:release] ? "Apple Distribution" : "Apple Development"),
+      targets: buildTarget,
+      # build_configurations: "Release",
+      code_sign_identity: "Apple Distribution",
       profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
     )
   end
 
-  desc "Setup and Build with options"
-  private_lane :build do |options|
-    puts("Fastlane - Currentdir: #{sh("pwd")}")
-    
+  desc "Setup and Build"
+  private_lane :build do
     disable_automatic_code_signing(path: xcodeproj)
-    # increment_build_number_manually
-    certificates(release: options[:release], profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"])
-    
+
+    certificates
+  
     settings_to_override = {
-      :BUNDLE_IDENTIFIER => APP_IDENTIFIER,
+      :BUNDLE_IDENTIFIER => ENV["MATCH_APP_IDENTIFIER"],
       :PROVISIONING_PROFILE_SPECIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"],
-      :DEVELOPMENT_TEAM => TEAM_ID
+      :DEVELOPMENT_TEAM => ENV['FASTLANE_TEAM_ID']
     }
 
+    unlock_keychain( 
+      path: keychainName,
+      password: keychainPassword,
+    )
+
     build_app(
+      scheme: buildTarget,
       workspace: workspace,
-      scheme: "swift",
-      export_method: (options[:release] ? "app-store" : "development"),
-      # archive_path: "./build/Runner.xcarchive",
-      # output_directory: "./build/Runner",
       xcargs: settings_to_override,
       export_options: {
-        signingStyle: "manual",
         provisioningProfiles: { 
-          APP_IDENTIFIER => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+          ENV["MATCH_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"],
         }
       }
     )
+    enable_automatic_code_signing(path: xcodeproj)
 
-    # enable_automatic_code_signing(path: xcodeproj)
   end
 
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    build(release: true)
-    # changelog_from_git_commits # this will generate the changelog based on your last commits
-    # testflight(
-    #   skip_waiting_for_build_processing: true
-    # )
-
-    delete_temp_keychain(keychainName)
+    build
+    # testflight
   end
 
   desc "Push a new beta build to Firebase"
   lane :firebase do
-    build(release: true)
-    # firebase_app_distribution(
-    #   app: "1:978524361958:ios:8433c15f3fed2da7cbd727",
-    #   testers: "jimmy.to.goldenowl@gmail.com",
-    #   release_notes: sh("git log -1 --pretty='%s'"),
-    #   firebase_cli_path: "/usr/local/bin/firebase",
-    #   ipa_path: "Runner.ipa",     
-    #   firebase_cli_token: FIREBASE_CLI_TOKEN
-    # )
-
+    build
+    # firebase_app_distribution
     delete_temp_keychain(keychainName)
   end
 
