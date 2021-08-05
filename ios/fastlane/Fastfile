@@ -54,7 +54,7 @@ platform :ios do
     match(
       app_identifier: ENV["MATCH_APP_IDENTIFIER"],
       type: "appstore",
-      readonly: false,
+      readonly: true,
       keychain_name: keychainName,
       keychain_password: keychainPassword,
     )
