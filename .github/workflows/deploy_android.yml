@@ -4,6 +4,9 @@
 
 name: Deploy Android
 on:
+  push:
+    branches: [ main ]
+    
   workflow_dispatch:
     inputs:
         lane:
