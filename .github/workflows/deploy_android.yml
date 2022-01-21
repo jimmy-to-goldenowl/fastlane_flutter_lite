@@ -33,7 +33,7 @@ jobs:
       - name: Build example APK
         run: flutter build apk --release
         env:
-          SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_ANDROID}}
+          SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN}}
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
