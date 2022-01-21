@@ -25,10 +25,15 @@ jobs:
           channel: stable
       - run: flutter doctor -v
 
-      # Checkout sourve code and get packages.
+      # Checkout source code and get packages.
       - name: Checkout source code
         uses: actions/checkout@v2
       - run: flutter pub get
+      
+      - name: Build example APK
+        run: flutter build apk --release
+        env:
+          SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_ANDROID}}
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane

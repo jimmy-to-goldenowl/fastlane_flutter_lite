@@ -5,12 +5,12 @@ platform :android do
 
   desc "Submit a new beta build to Google Play"
   lane :beta do
-    sh "flutter build appbundle -v"
+    # sh "flutter build appbundle -v"
   end
 
 
   desc "Deploy with Firebase"
   lane :firebase do
-    sh "flutter build appbundle -v"
+    # sh "flutter build appbundle -v"
   end
 end

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,6 +29,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final LatLng a = LatLng(0, 0);
 
   void _incrementCounter() {
     setState(() {
