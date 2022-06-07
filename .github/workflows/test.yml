@@ -64,11 +64,11 @@ jobs:
           reporter: flutter-json        # Format of test results
 
 
-      # - name: Publish Test Reports
-      #   uses: ueki-tomohiro/flutter-test-action@v1
-      #   with:
-      #     # title: 'Flutter test results'
-      #     machinePath: test.json
-      #     coveragePath: coverage/lcov.info
-      #     token:  ${{ secrets.GITHUB_TOKEN }}
-      #   if: success() || failure()
+      - name: Publish Test Reports
+        uses: ueki-tomohiro/flutter-test-action@v1
+        with:
+          title: 'Flutter coverage results'
+          # machinePath: test.json
+          coveragePath: coverage/lcov.info
+          token:  ${{ secrets.GITHUB_TOKEN }}
+        if: success() || failure()
