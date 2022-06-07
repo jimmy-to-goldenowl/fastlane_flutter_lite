@@ -70,5 +70,5 @@ jobs:
           title: 'Flutter coverage results'
           # machinePath: test.json
           coveragePath: coverage/lcov.info
-          token:  ${{ secrets.GITHUB_TOKEN }}
+          # token:  ${{ secrets.GITHUB_TOKEN }}
         if: success() || failure()
