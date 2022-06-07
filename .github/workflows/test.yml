@@ -12,9 +12,10 @@ on:
 ###############
 # Set the Job #
 ###############
-permissions: write-all
 jobs:
   test:
+    permissions:
+      checks: write
     name: Flutter Test Report
     runs-on: ubuntu-latest
 
