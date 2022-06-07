@@ -249,3 +249,5 @@ protos/protoc
 .env
 ios/Gemfile.lock
 ios/Podfile.lock
+
+coverage/
