@@ -12,9 +12,10 @@ on:
 ###############
 # Set the Job #
 ###############
-permissions: write-all
 jobs:
   test:
+    permissions:
+      checks: write
     name: Flutter Test Report
     runs-on: ubuntu-latest
 
@@ -53,12 +54,21 @@ jobs:
       - name: Flutter Coverage
         run: flutter test --coverage
         if: success() || failure()
-
-      - name: Publish Test Reports
-        uses: ueki-tomohiro/flutter-test-action@v1
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
         with:
-          # title: 'Flutter test results'
-          machinePath: test.json
-          coveragePath: coverage/lcov.info
+          name: Flutter Tests            # Name of the check run which will be created
+          path: test.json    # Path to test results
           token:  ${{ secrets.GITHUB_TOKEN }}
-        if: success() || failure()
+          reporter: flutter-json        # Format of test results
+
+
+      # - name: Publish Test Reports
+      #   uses: ueki-tomohiro/flutter-test-action@v1
+      #   with:
+      #     title: 'Flutter coverage results'
+      #     machinePath: test.json
+      #     coveragePath: coverage/lcov.info
+      #     token:  ${{ secrets.GITHUB_TOKEN }}
+      #   if: success() || failure()
